@@ -1,0 +1,99 @@
+﻿<Window x:Class="AuthApp.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Login" Height="350" Width="450" WindowStartupLocation="CenterScreen" 
+        Background="Transparent">
+
+    <Window.Resources>
+        <!-- Button Hover Animation -->
+        <Style x:Key="ButtonHoverStyle" TargetType="Button">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Button.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Duration="0:0:0.2" To="#45a049" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Button.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Duration="0:0:0.2" To="#4CAF50" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Button Hover Animation for Register Button -->
+        <Style x:Key="RegisterButtonHoverStyle" TargetType="Button">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Button.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Duration="0:0:0.2" To="#1976D2" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Button.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Duration="0:0:0.2" To="#2196F3" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="30">
+        <!-- Gradient Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#4CAF50" Offset="0"/>
+                <GradientStop Color="#81C784" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- Background Rectangle for a sleek look -->
+        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="White" RadiusX="10" RadiusY="10" Stroke="#e0e0e0" StrokeThickness="1" />
+
+        <!-- Title text with a modern font -->
+        <TextBlock Text="Login" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0" Foreground="#333"/>
+
+        <!-- Username Label -->
+        <TextBlock Text="Username:" Margin="40,80,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Foreground="#555"/>
+        <TextBox Name="UsernameTextBox" Margin="120,80,40,0" VerticalAlignment="Top" Height="35" FontSize="14" Padding="10,0" BorderBrush="#CCCCCC" BorderThickness="1" Background="#FFFFFF"/>
+
+        <!-- Password Label -->
+        <TextBlock Text="Password:" Margin="40,130,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Foreground="#555"/>
+        <PasswordBox Name="PasswordBox" Margin="120,130,40,0" VerticalAlignment="Top" Height="35" FontSize="14" Padding="10,0" BorderBrush="#CCCCCC" BorderThickness="1" Background="#FFFFFF"/>
+
+        <!-- Login Button with rounded corners using Border -->
+        <Button Width="180" Height="40" Margin="30,200,40,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16" FontWeight="Bold" Background="#4CAF50" Foreground="White" BorderBrush="#4CAF50" BorderThickness="1" Style="{StaticResource ButtonHoverStyle}" Click="LoginButton_Click">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+            Login
+        </Button>
+
+        <!-- Register Button with rounded corners using Border -->
+        <Button Width="180" Height="40" Margin="200,200,30,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16" FontWeight="Bold" Background="#2196F3" Foreground="White" BorderBrush="#2196F3" BorderThickness="1" Style="{StaticResource RegisterButtonHoverStyle}" Click="RegisterButton_Click">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+            Register
+        </Button>
+
+        <!-- Optional: Add a separator line between buttons -->
+        <Line X1="0" Y1="245" X2="400" Y2="245" Stroke="#DDDDDD" StrokeThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+    </Grid>
+</Window>

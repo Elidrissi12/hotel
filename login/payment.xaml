@@ -1,0 +1,40 @@
+﻿<Window x:Class="AuthApp.Payment"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Payment Management" Height="800" Width="800">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Payments">
+                <Grid>
+                    <!-- DataGrid for displaying payments -->
+                    <DataGrid x:Name="PaymentDataGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="750" Height="300" Margin="20,10,20,0" AutoGenerateColumns="True"/>
+
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20, 320, 0, 0">
+                        <TextBlock Text="Payment ID" />
+                        <TextBox x:Name="PaymentIDTextBox" Width="200" Margin="0,5" IsReadOnly="True"/>
+
+                        <TextBlock Text="Reservation ID" />
+                        <TextBox x:Name="ReservationIDTextBox" Width="200" Margin="0,5"/>
+
+                        <TextBlock Text="Amount" />
+                        <TextBox x:Name="AmountTextBox" Width="200" Margin="0,5"/>
+
+                        <TextBlock Text="Payment Date" />
+                        <DatePicker x:Name="PaymentDatePicker" Width="200" Margin="0,5"/>
+
+                        <TextBlock Text="Payment Method" />
+                        <TextBox x:Name="PaymentMethodTextBox" Width="200" Margin="0,5"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <Button x:Name="AddPaymentButton" Content="Add" Width="100" Click="AddPaymentButton_Click" Margin="5"/>
+                            <Button x:Name="SavePaymentButton" Content="Save" Width="100" Click="SavePaymentButton_Click" Margin="5"/>
+                            <Button x:Name="ModifyPaymentButton" Content="Modify" Width="100" Click="ModifyPaymentButton_Click" Margin="5"/>
+                            <Button x:Name="DeletePaymentButton" Content="Delete" Width="100" Click="DeletePaymentButton_Click" Margin="5"/>
+                            <Button x:Name="accueil" Content="accueil" Width="100" Click="accuielButton_Click" Margin="5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

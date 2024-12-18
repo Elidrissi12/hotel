@@ -1,0 +1,15 @@
+﻿<Window x:Class="AuthApp.RegisterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Register" Height="300" Width="400">
+    <Grid>
+        <TextBlock Text="Username:" Margin="30,50,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <TextBox Name="UsernameTextBox" Margin="120,50,30,0" VerticalAlignment="Top" Height="30"/>
+
+        <TextBlock Text="Password:" Margin="30,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <PasswordBox Name="PasswordBox" Margin="120,100,30,0" VerticalAlignment="Top" Height="30"/>
+
+        <Button Content="Register" Margin="30,170,200,30" Click="RegisterButton_Click"/>
+        <Button Content="Back to Login" Margin="200,170,30,30" Click="BackToLoginButton_Click"/>
+    </Grid>
+</Window>
