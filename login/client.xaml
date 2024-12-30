@@ -1,42 +1,205 @@
 ﻿<Window x:Class="AuthApp.Client"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Client Management" Height="700" Width="800">
+        Title="Client Management" Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        WindowStyle="None">
+    <Window.Resources>
+        <!-- Style pour les boutons -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="160"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980b9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style pour TabControl -->
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+
+        <!-- Style pour TabItem -->
+        <Style TargetType="TabItem">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#2c3e50"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#ecf0f1"/>
+                    <Setter Property="Foreground" Value="#3498db"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style pour DataGrid -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#ecf0f1"/>
+            <Setter Property="Foreground" Value="#2c3e50"/>
+            <Setter Property="BorderBrush" Value="#ddd"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Style pour le Sidebar -->
+        <Style x:Key="SidebarButton" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="10,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+        </Style>
+
+        <!-- Style pour les cartes d'information -->
+        <Style x:Key="InfoCard" TargetType="Border">
+            <Setter Property="Background" Value="#ffffff"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="BorderBrush" Value="#ddd"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <TabControl>
-            <TabItem Header="Clients">
-                <Grid>
-                    <DataGrid x:Name="ClientDataGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="750" Height="300" Margin="20,10,20,0" AutoGenerateColumns="True"/>
+        <!-- Grille principale avec deux colonnes -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <!-- Barre latérale -->
+            <ColumnDefinition Width="*"/>
+            <!-- Contenu principal -->
+        </Grid.ColumnDefinitions>
 
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20, 320, 0, 0">
-                        <TextBlock Text="Client ID" />
-                        <TextBox x:Name="ClientIDTextBox" Width="200" Margin="0,5" IsReadOnly="True"/>
+        <!-- Barre latérale -->
+        <StackPanel Grid.Column="0" Background="#cecabf" VerticalAlignment="Stretch">
+            <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\bin\Debug\net8.0-windows\IMAR.png" Width="200" Height="180" HorizontalAlignment="Center" Margin="20"/>
 
-                        <TextBlock Text="Name" />
-                        <TextBox x:Name="NameTextBox" Width="200" Margin="0,5"/>
+            <!-- Réservations Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="ReservationsButton_Click" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\reservationn.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Réservations" Foreground="BLACK" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
 
-                        <TextBlock Text="Prenom" />
-                        <TextBox x:Name="PrenomTextBox" Width="200" Margin="0,5"/>
+            <!-- Paiement Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="PymentButton_Click" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\paiement.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Payment" Foreground="BLACK" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
 
-                        <TextBlock Text="Email" />
-                        <TextBox x:Name="EmailTextBox" Width="200" Margin="0,5"/>
+            <!-- Roomtypes Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="RoomtypesButton_Click" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\lit.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Roomtypes" Foreground="BLACK" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
 
-                        <TextBlock Text="Phone Number" />
-                        <TextBox x:Name="PhoneNumberTextBox" Width="200" Margin="0,5"/>
+            <!-- Employee Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="EmployeeButton_Click" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\employees.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Employee" Foreground="BLACK" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
 
-                        <TextBlock Text="Adresse" />
-                        <TextBox x:Name="AdresseTextBox" Width="200" Margin="0,5"/>
+            <!-- Client Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="ClientButton_Click" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\client.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Client" Foreground="BLACK" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                            <Button x:Name="AddClientButton" Content="Add" Width="100" Click="AddClientButton_Click" Margin="5"/>
-                            <Button x:Name="SaveClientButton" Content="Save" Width="100" Click="SaveClientButton_Click" Margin="5"/>
-                            <Button x:Name="ModifyClientButton" Content="Modify" Width="100" Click="ModifyClientButton_Click" Margin="5"/>
-                            <Button x:Name="DeleteClientButton" Content="Delete" Width="100" Click="DeleteClientButton_Click" Margin="5"/>
-                            <Button x:Name="ChambreButton" Content="accueil" Width="100" Click="ChambreButton_Click" Margin="5"/>
+            <!-- Rooms Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="RoomsButton_Click" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\chambre.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Rooms" Foreground="BLACK" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Dashboard Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="DashboardButton_Click" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\graphique.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Dashboard" Foreground="BLACK" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Déconnexion Button avec Icône -->
+            <Button Style="{StaticResource SidebarButton}" Click="LogoutButton_Click" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\se-deconnecter.png" Width="20" Height="20" Margin="10,0"/>
+                    <TextBlock Text="Déconnexion" Foreground="BLACK" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- Contenu principal -->
+        <Grid Grid.Column="1" Margin="10">
+            <TabControl>
+                <TabItem Header="Clients">
+                    <Grid>
+                        <!-- Tableau des clients -->
+                        <DataGrid x:Name="ClientDataGrid" 
+                                  HorizontalAlignment="Left" 
+                                  VerticalAlignment="Top" 
+                                  Width="750" 
+                                  Height="300" 
+                                  Margin="20,10,20,0" 
+                                  AutoGenerateColumns="True"/>
+
+                        <!-- Formulaire de gestion des clients -->
+                        <StackPanel Orientation="Vertical" Margin="20,320,0,0">
+                            <TextBlock Text="Client ID" />
+                            <TextBox x:Name="ClientIDTextBox" Width="200" Margin="0,5" IsReadOnly="True"/>
+
+                            <TextBlock Text="Nom" />
+                            <TextBox x:Name="NameTextBox" Width="200" Margin="0,5"/>
+
+                            <TextBlock Text="Prénom" />
+                            <TextBox x:Name="PrenomTextBox" Width="200" Margin="0,5"/>
+
+                            <TextBlock Text="Email" />
+                            <TextBox x:Name="EmailTextBox" Width="200" Margin="0,5"/>
+
+                            <TextBlock Text="Numéro de Téléphone" />
+                            <TextBox x:Name="PhoneNumberTextBox" Width="200" Margin="0,5"/>
+
+                            <TextBlock Text="Adresse" />
+                            <TextBox x:Name="AdresseTextBox" Width="200" Margin="0,5"/>
+
+                            <!-- Boutons d'action -->
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button x:Name="AddClientButton" Content="Ajouter" Width="100" Click="AddClientButton_Click" Margin="5"/>
+                                <Button x:Name="SaveClientButton" Content="Enregistrer" Width="100" Click="SaveClientButton_Click" Margin="5"/>
+                                <Button x:Name="ModifyClientButton" Content="Modifier" Width="100" Click="ModifyClientButton_Click" Margin="5"/>
+                                <Button x:Name="DeleteClientButton" Content="Supprimer" Width="100" Click="DeleteClientButton_Click" Margin="5"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-        </TabControl>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
     </Grid>
 </Window>

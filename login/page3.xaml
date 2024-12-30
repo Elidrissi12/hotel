@@ -27,6 +27,11 @@
         </Style>
     </Window.Resources>
 
+    <!-- Set the background image for the Window -->
+    <Window.Background>
+        <ImageBrush ImageSource="C:\Users\ABDO EL IDRISSI\source\repos\login\login\bin\Debug\net8.0-windows\IMAR.png" />
+    </Window.Background>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,6 +39,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -65,5 +71,7 @@
 
         <!-- Button 6: Export Data -->
         <Button Grid.Row="2" Grid.Column="2" Content="Manage Room Types" Click="ExportData_Click"/>
+
+        <Button Grid.Row="2" Grid.Column="6" Content="Dashboard" Click="Dashboard_Click"/>
     </Grid>
 </Window>

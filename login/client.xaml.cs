@@ -64,8 +64,8 @@ namespace AuthApp
                 {
                     await connection.OpenAsync();
                     string query = client.Id == 0
-                        ? "INSERT INTO Client (Nom, Prenom, Email, Telephone, Adresse) VALUES (@Nom, @Prenom, @Email, @Telephone, @Adresse)"
-                        : "UPDATE Client SET nom = @Nom, Prenom = @Prenom, Email = @Email, Telephone = @Telephone, Adresse = @Adresse WHERE Id = @Id";
+                        ? "INSERT INTO Client (LastName, FirstName, Email, Phone, Adresse) VALUES (@Nom, @Prenom, @Email, @Telephone, @Adresse)"
+                        : "UPDATE Client SET Nom = @Nom, Prenom = @Prenom, Email = @Email, Telephone = @Telephone, Adresse = @Adresse WHERE Id = @Id";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Nom", client.Name);
@@ -73,7 +73,6 @@ namespace AuthApp
                     command.Parameters.AddWithValue("@Email", client.Email);
                     command.Parameters.AddWithValue("@Telephone", client.PhoneNumber);
                     command.Parameters.AddWithValue("@Adresse", client.Adresse);
-                    
 
                     if (client.Id != 0)
                     {
@@ -85,6 +84,24 @@ namespace AuthApp
                     if (rowsAffected > 0)
                     {
                         MessageBox.Show(client.Id == 0 ? "Client added successfully!" : "Client updated successfully!");
+
+                        // Envoyer un email de notification
+                        var emailService = new EmailService();
+                        string subject = client.Id == 0 ? "Bienvenue à notre hôtel" : "Modification de vos informations";
+                        string body = $@"
+                    <p>Bonjour {client.Name} {client.Prenom},</p>
+                    <p>Merci de {(client.Id == 0 ? "nous avoir rejoints" : "mettre à jour vos informations")}. Voici un récapitulatif :</p>
+                    <ul>
+                        <li><strong>Nom :</strong> {client.Name}</li>
+                        <li><strong>Prénom :</strong> {client.Prenom}</li>
+                        <li><strong>Email :</strong> {client.Email}</li>
+                        <li><strong>Téléphone :</strong> {client.PhoneNumber}</li>
+                        <li><strong>Adresse :</strong> {client.Adresse}</li>
+                    </ul>
+                    <p>Nous sommes ravis de vous compter parmi nos clients.</p>
+                    <p>Cordialement,<br>L'équipe de l'hôtel</p>";
+
+                        await emailService.SendEmailAsync(client.Email, subject, body);
                     }
                     else
                     {
@@ -97,6 +114,7 @@ namespace AuthApp
                 MessageBox.Show($"Error saving client: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         // Add a new client
         private void AddClientButton_Click(object sender, RoutedEventArgs e)
@@ -152,48 +170,138 @@ namespace AuthApp
         // Delete client
         private async void DeleteClientButton_Click(object sender, RoutedEventArgs e)
         {
-            int clientId = int.TryParse(ClientIDTextBox.Text, out var id) ? id : 0;
-
-            if (clientId == 0)
+            // Check if a row is selected in the DataGrid
+            if (ClientDataGrid.SelectedItem == null)
             {
-                MessageBox.Show("Please select a valid client to delete.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Please select a client to delete.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
+            // Get the selected client
+            var selectedClient = ClientDataGrid.SelectedItem as ClientEntity;
+
+            if (selectedClient == null)
+            {
+                MessageBox.Show("Please select a valid client.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            int clientId = selectedClient.Id;
+
+            // Confirm deletion with the user
             var result = MessageBox.Show("Are you sure you want to delete this client?", "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
-                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                try
                 {
-                    await connection.OpenAsync();
-                    string query = "DELETE FROM Client WHERE Id = @Id";
-
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@Id", clientId);
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                    if (rowsAffected > 0)
+                    using (SqlConnection connection = new SqlConnection(ConnectionString))
                     {
-                        MessageBox.Show("Client deleted successfully!");
-                        await LoadClientDataAsync();
+                        await connection.OpenAsync();
+                        string query = "DELETE FROM Client WHERE Id = @Id";
+
+                        SqlCommand command = new SqlCommand(query, connection);
+                        command.Parameters.AddWithValue("@Id", clientId);
+
+                        int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Client deleted successfully!");
+                            await LoadClientDataAsync(); // Refresh the data grid
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to delete the client. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
-                    else
-                    {
-                        MessageBox.Show("Failed to delete the client. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting client: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
-        private void ChambreButton_Click(object sender, RoutedEventArgs e)
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            page3 r = new page3();
-            r.Show();
+            LoginWindow loginPage = new LoginWindow();
+            loginPage.Show();
+            this.Close();
+        }
+
+        private void acceuilButton_Click(object sender, RoutedEventArgs e)
+        {
+            page3 loginPage = new page3();
+            loginPage.Show();
+            this.Close();
+        }
+
+
+
+        private void ReservationsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Reservation reservationPage = new Reservation();
+            reservationPage.Show();
+            this.Close();
+        }
+
+        private void PymentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Payment x = new Payment();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomtypesButton_Click(object sender, RoutedEventArgs e)
+        {
+            TypeChambre x = new TypeChambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void EmployeeButton_Click(object sender, RoutedEventArgs e)
+        {
+            page1 x = new page1();
+            x.Show();
+            this.Close();
+        }
+
+        private void ClientButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client x = new Client();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Chambre x = new Chambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void DashboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dashboard x = new Dashboard();
+            x.Show();
             this.Close();
         }
     }
+
+    
+
+    // Navigation vers la page Clients (à implémenter)
+    
+
+    // Affichage des statistiques
+    
+    
+
+    
+
+   
 
     // Entity class for clients
     public class ClientEntity

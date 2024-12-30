@@ -66,5 +66,12 @@ namespace login
             r.Show();
             this.Close();
         }
+
+        private void Dashboard_Click(object sender, RoutedEventArgs e)
+        {
+            Dashboard r = new Dashboard();
+            r.Show();
+            this.Close();
+        }
     }
 }

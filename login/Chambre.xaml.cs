@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using login;
 
 namespace AuthApp
@@ -41,7 +43,8 @@ namespace AuthApp
                                 Id = reader.GetInt32(0),
                                 Numero = reader.GetString(1),
                                 Statut = reader.GetString(2),
-                                IdTypeChambre = reader.GetInt32(3)
+                                IdTypeChambre = reader.GetInt32(3),
+                                
                             });
                         }
                     }
@@ -53,39 +56,41 @@ namespace AuthApp
             }
         }
 
+
         // Sauvegarder ou modifier une chambre
         private async Task SaveChambreAsync(ChambreEntity chambre)
         {
+            if (chambre == null) throw new ArgumentNullException(nameof(chambre));
+
+            string query = chambre.Id == 0
+                ? "INSERT INTO Chambre (Numero, Statut, IdTypeChambre) VALUES (@Numero, @Statut, @IdTypeChambre)"
+                : "UPDATE Chambre SET Numero = @Numero, Statut = @Statut, IdTypeChambre = @IdTypeChambre WHERE Id = @Id";
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(ConnectionString))
                 {
                     await connection.OpenAsync();
-                    string query = chambre.Id == 0
-                        ? "INSERT INTO Chambre (Numero, Statut, IdTypeChambre) VALUES (@Numero, @Statut, @IdTypeChambre)"
-                        : "UPDATE Chambre SET Numero = @Numero, Statut = @Statut, IdTypeChambre = @IdTypeChambre WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Numero", chambre.Numero);
+                        command.Parameters.AddWithValue("@Statut", chambre.Statut);
+                        command.Parameters.AddWithValue("@IdTypeChambre", chambre.IdTypeChambre);
+                        if (chambre.Id != 0)
+                            command.Parameters.AddWithValue("@Id", chambre.Id);
 
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@Numero", chambre.Numero);
-                    command.Parameters.AddWithValue("@Statut", chambre.Statut);
-                    command.Parameters.AddWithValue("@IdTypeChambre", chambre.IdTypeChambre);
-
-                    if (chambre.Id != 0)
-                        command.Parameters.AddWithValue("@Id", chambre.Id);
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                    if (rowsAffected > 0)
-                        MessageBox.Show(chambre.Id == 0 ? "Chambre ajoutée avec succès !" : "Chambre modifiée avec succès !");
-                    else
-                        MessageBox.Show("Erreur lors de la sauvegarde de la chambre.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                        int rowsAffected = await command.ExecuteNonQueryAsync();
+                        MessageBox.Show(rowsAffected > 0 ? "Opération réussie !" : "Aucune modification effectuée.",
+                                        "Résultat", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors de la sauvegarde de la chambre: {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Erreur: {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         // Ajouter une nouvelle chambre
         private async void AddChambreButton_Click(object sender, RoutedEventArgs e)
@@ -119,63 +124,161 @@ namespace AuthApp
         // Modifier une chambre existante
         private async void ModifyChambreButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ChambreDataGrid.SelectedItem is not ChambreEntity chambre)
+            // Ensure a valid chambre is selected
+            if (ChambreDataGrid.SelectedItem is not ChambreEntity selectedChambre)
             {
                 MessageBox.Show("Veuillez sélectionner une chambre pour la modifier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            ChambreIDTextBox.Text = chambre.Id.ToString();
-            ChambreNumeroTextBox.Text = chambre.Numero;
-            ChambreStatutTextBox.Text = chambre.Statut;
-            ChambreTypeIdTextBox.Text = chambre.IdTypeChambre.ToString();
+            // Clear existing inputs before populating
+            ChambreIDTextBox.Clear();
+            ChambreNumeroTextBox.Clear();
+            ChambreStatutTextBox.Clear();
+            ChambreTypeIdTextBox.Clear();
+
+            // Populate input fields with selected chambre details
+            ChambreIDTextBox.Text = selectedChambre.Id.ToString();
+            ChambreNumeroTextBox.Text = selectedChambre.Numero;
+            ChambreStatutTextBox.Text = selectedChambre.Statut;
+            ChambreTypeIdTextBox.Text = selectedChambre.IdTypeChambre.ToString();
+
+            // Optional: Provide feedback to the user
+            MessageBox.Show("Les détails de la chambre sont prêts pour modification.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
 
         // Supprimer une chambre
         private async void DeleteChambreButton_Click(object sender, RoutedEventArgs e)
         {
+            // Ensure a chambre is selected
             if (ChambreDataGrid.SelectedItem is not ChambreEntity chambre)
             {
                 MessageBox.Show("Veuillez sélectionner une chambre à supprimer.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
+            // Confirm deletion with the user
             var result = MessageBox.Show("Êtes-vous sûr de vouloir supprimer cette chambre ?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes)
+                return;
 
-            if (result == MessageBoxResult.Yes)
+            // Delete operation
+            try
             {
-                try
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
                 {
-                    using (SqlConnection connection = new SqlConnection(ConnectionString))
+                    await connection.OpenAsync();
+
+                    string query = "DELETE FROM Chambre WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        await connection.OpenAsync();
-                        string query = "DELETE FROM Chambre WHERE Id = @Id";
-                        SqlCommand command = new SqlCommand(query, connection);
-                        command.Parameters.AddWithValue("@Id", chambre.Id);
+                        command.Parameters.Add(new SqlParameter("@Id", SqlDbType.Int) { Value = chambre.Id });
 
                         int rowsAffected = await command.ExecuteNonQueryAsync();
 
                         if (rowsAffected > 0)
                         {
-                            MessageBox.Show("Chambre supprimée avec succès !");
-                            await LoadChambreDataAsync();
+                            MessageBox.Show("Chambre supprimée avec succès !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                            await LoadChambreDataAsync(); // Refresh data
                         }
                         else
                         {
-                            MessageBox.Show("Erreur lors de la suppression de la chambre.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show("Aucune chambre n'a été supprimée. Veuillez réessayer.", "Information", MessageBoxButton.OK, MessageBoxImage.Warning);
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Erreur lors de la suppression de la chambre: {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors de la suppression de la chambre : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private void typechambreButton_Click(object sender, RoutedEventArgs e)
         {
             page3 x = new page3();
+            x.Show();
+            this.Close();
+        }
+
+        private void UploadImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Images (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string selectedFile = openFileDialog.FileName;
+                ChambreImage.Source = new BitmapImage(new Uri(selectedFile));
+                // Optional: Save image path or binary to the database
+            }
+        }
+        
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow loginPage = new LoginWindow();
+            loginPage.Show();
+            this.Close();
+        }
+
+        private void acceuilButton_Click(object sender, RoutedEventArgs e)
+        {
+            page3 loginPage = new page3();
+            loginPage.Show();
+            this.Close();
+        }
+
+        
+
+        private void ReservationsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Reservation reservationPage = new Reservation();
+            reservationPage.Show();
+            this.Close();
+        }
+
+        private void PymentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Payment x = new Payment();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomtypesButton_Click(object sender, RoutedEventArgs e)
+        {
+            TypeChambre x = new TypeChambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void EmployeeButton_Click(object sender, RoutedEventArgs e)
+        {
+            page1 x = new page1();
+            x.Show();
+            this.Close();
+        }
+
+        private void ClientButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client x = new Client();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Chambre x = new Chambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void DashboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dashboard x = new Dashboard();
             x.Show();
             this.Close();
         }
@@ -188,5 +291,6 @@ namespace AuthApp
         public string Numero { get; set; }
         public string Statut { get; set; }
         public int IdTypeChambre { get; set; }
+        
     }
 }

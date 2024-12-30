@@ -3,6 +3,8 @@ using System.Data.SqlClient;
 using System.Windows;
 using login;
 
+
+
 namespace AuthApp
 {
     public partial class LoginWindow : Window
@@ -22,7 +24,7 @@ namespace AuthApp
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
-                string query = "SELECT COUNT(1) FROM Users WHERE Username = @Username AND Password = @Password";
+                string query = "SELECT COUNT(1) FROM admin WHERE Username = @Username AND Password = @Password";
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Username", username);
@@ -40,9 +42,12 @@ namespace AuthApp
                     {
                         MessageBox.Show("Invalid username or password.");
                     }
+
                 }
             }
         }
+
+
 
         private void RegisterButton_Click(object sender, RoutedEventArgs e)
         {

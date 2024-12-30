@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Windows;
+using ClosedXML.Excel;
+using Microsoft.Win32;
 
 namespace AuthApp
 {
@@ -204,10 +206,119 @@ namespace AuthApp
             }
         }
 
-        private void page2Button_Click(object sender, RoutedEventArgs e)
+        private void ExportToExcelButton_Click(object sender, RoutedEventArgs e)
         {
-            page3 r = new page3();
-            r.Show();
+            try
+            {
+                // Create a SaveFileDialog to let the user choose the file name and location
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "Excel Files (*.xlsx)|*.xlsx",
+                    Title = "Save Employee Data"
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    // Create a new workbook
+                    using (var workbook = new XLWorkbook())
+                    {
+                        // Create a worksheet
+                        var worksheet = workbook.Worksheets.Add("Employees");
+
+                        // Add header row
+                        worksheet.Cell(1, 1).Value = "ID";
+                        worksheet.Cell(1, 2).Value = "Nom";
+                        worksheet.Cell(1, 3).Value = "Prenom";
+                        worksheet.Cell(1, 4).Value = "Email";
+                        worksheet.Cell(1, 5).Value = "Telephone";
+                        worksheet.Cell(1, 6).Value = "Role";
+
+                        // Add employee data
+                        for (int i = 0; i < employees.Count; i++)
+                        {
+                            var employee = employees[i];
+                            worksheet.Cell(i + 2, 1).Value = employee.Id;
+                            worksheet.Cell(i + 2, 2).Value = employee.Nom;
+                            worksheet.Cell(i + 2, 3).Value = employee.Prenom;
+                            worksheet.Cell(i + 2, 4).Value = employee.Email;
+                            worksheet.Cell(i + 2, 5).Value = employee.Telephone;
+                            worksheet.Cell(i + 2, 6).Value = employee.Role;
+                        }
+
+                        // Save the workbook to the selected path
+                        workbook.SaveAs(saveFileDialog.FileName);
+                        MessageBox.Show("Employee data exported successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error exporting data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow loginPage = new LoginWindow();
+            loginPage.Show();
+            this.Close();
+        }
+
+        private void acceuilButton_Click(object sender, RoutedEventArgs e)
+        {
+            page3 loginPage = new page3();
+            loginPage.Show();
+            this.Close();
+        }
+
+
+
+        private void ReservationsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Reservation reservationPage = new Reservation();
+            reservationPage.Show();
+            this.Close();
+        }
+
+        private void PymentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Payment x = new Payment();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomtypesButton_Click(object sender, RoutedEventArgs e)
+        {
+            TypeChambre x = new TypeChambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void EmployeeButton_Click(object sender, RoutedEventArgs e)
+        {
+            page1 x = new page1();
+            x.Show();
+            this.Close();
+        }
+
+        private void ClientButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client x = new Client();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Chambre x = new Chambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void DashboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dashboard x = new Dashboard();
+            x.Show();
             this.Close();
         }
     }

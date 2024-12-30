@@ -27,7 +27,7 @@ namespace AuthApp
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Users (Username, Password) VALUES (@Username, @Password)";
+                string query = "INSERT INTO admin (Username, Password) VALUES (@Username, @Password)";
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Username", username);

@@ -109,44 +109,121 @@ namespace AuthApp
 
         private async void DeleteTypeButton_Click(object sender, RoutedEventArgs e)
         {
-            int typeId = int.TryParse(TypeIDTextBox.Text, out var id) ? id : 0;
-
-            if (typeId == 0)
+            // Check if a row is selected in the DataGrid
+            if (TypeChambreDataGrid.SelectedItem == null)
             {
-                MessageBox.Show("Please select a valid room type to delete.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Please select a room type to delete.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
+            // Get the selected room type
+            var selectedTypeChambre = TypeChambreDataGrid.SelectedItem as TypeChambreEntity;
+
+            if (selectedTypeChambre == null)
+            {
+                MessageBox.Show("Please select a valid room type.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            int typeId = selectedTypeChambre.IdTypeChambre;
+
+            // Confirm deletion with the user
             var result = MessageBox.Show("Are you sure you want to delete this room type?", "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
-                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                try
                 {
-                    await connection.OpenAsync();
-                    string query = "DELETE FROM TypeChambre WHERE IdTypeChambre = @IdTypeChambre";
-
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@IdTypeChambre", typeId);
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                    if (rowsAffected > 0)
+                    using (SqlConnection connection = new SqlConnection(ConnectionString))
                     {
-                        MessageBox.Show("Room type deleted successfully!");
-                        await LoadTypeChambreDataAsync();
+                        await connection.OpenAsync();
+                        string query = "DELETE FROM TypeChambre WHERE Id = @IdTypeChambre";
+
+                        SqlCommand command = new SqlCommand(query, connection);
+                        command.Parameters.AddWithValue("@IdTypeChambre", typeId);
+
+                        int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Room type deleted successfully!");
+                            await LoadTypeChambreDataAsync(); // Refresh the data grid
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to delete the room type. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
-                    else
-                    {
-                        MessageBox.Show("Failed to delete the room type. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting room type: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
-        private void accueilButton_Click(object sender, RoutedEventArgs e)
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            page3 x = new page3();
+            LoginWindow loginPage = new LoginWindow();
+            loginPage.Show();
+            this.Close();
+        }
+
+        private void acceuilButton_Click(object sender, RoutedEventArgs e)
+        {
+            page3 loginPage = new page3();
+            loginPage.Show();
+            this.Close();
+        }
+
+
+
+        private void ReservationsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Reservation reservationPage = new Reservation();
+            reservationPage.Show();
+            this.Close();
+        }
+
+        private void PymentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Payment x = new Payment();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomtypesButton_Click(object sender, RoutedEventArgs e)
+        {
+            TypeChambre x = new TypeChambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void EmployeeButton_Click(object sender, RoutedEventArgs e)
+        {
+            page1 x = new page1();
+            x.Show();
+            this.Close();
+        }
+
+        private void ClientButton_Click(object sender, RoutedEventArgs e)
+        {
+            Client x = new Client();
+            x.Show();
+            this.Close();
+        }
+
+        private void RoomsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Chambre x = new Chambre();
+            x.Show();
+            this.Close();
+        }
+
+        private void DashboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dashboard x = new Dashboard();
             x.Show();
             this.Close();
         }

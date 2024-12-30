@@ -1,12 +1,26 @@
 ﻿<Window x:Class="AuthApp.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Login" Height="350" Width="450" WindowStartupLocation="CenterScreen" 
+        Title="Login" Height="486" Width="450" WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
         Background="Transparent">
+
 
     <Window.Resources>
         <!-- Button Hover Animation -->
         <Style x:Key="ButtonHoverStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Style.Triggers>
                 <EventTrigger RoutedEvent="Button.MouseEnter">
                     <BeginStoryboard>
@@ -27,6 +41,18 @@
 
         <!-- Button Hover Animation for Register Button -->
         <Style x:Key="RegisterButtonHoverStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Style.Triggers>
                 <EventTrigger RoutedEvent="Button.MouseEnter">
                     <BeginStoryboard>
@@ -46,31 +72,39 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="30">
-        <!-- Gradient Background -->
+    <Grid Margin="0,0,0,-14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="78*"/>
+            <RowDefinition Height="97*"/>
+            <RowDefinition Height="14*"/>
+        </Grid.RowDefinitions>
+        <!-- Background Image -->
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#4CAF50" Offset="0"/>
-                <GradientStop Color="#81C784" Offset="1"/>
-            </LinearGradientBrush>
+            <ImageBrush ImageSource="C:\Users\ABDO EL IDRISSI\source\repos\login\login\bin\Debug\net8.0-windows\IMAR.png" Stretch="UniformToFill"/>
         </Grid.Background>
 
         <!-- Background Rectangle for a sleek look -->
-        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="White" RadiusX="10" RadiusY="10" Stroke="#e0e0e0" StrokeThickness="1" />
+        <Rectangle Fill="White" RadiusX="10" RadiusY="10" Stroke="#e0e0e0" StrokeThickness="1" Opacity="0.6" Grid.RowSpan="3"/>
 
         <!-- Title text with a modern font -->
-        <TextBlock Text="Login" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0" Foreground="#333"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+            <!-- Icone -->
+            <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\mot-de-passe.png" Width="50" Height="40" Margin="0,0,10,0"/>
+            <TextBlock Text="Login" FontSize="24" FontWeight="Bold" Foreground="#333" Height="32" Width="118"/>
+
+            <!-- Texte -->
+        </StackPanel>
 
         <!-- Username Label -->
-        <TextBlock Text="Username:" Margin="40,80,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Foreground="#555"/>
-        <TextBox Name="UsernameTextBox" Margin="120,80,40,0" VerticalAlignment="Top" Height="35" FontSize="14" Padding="10,0" BorderBrush="#CCCCCC" BorderThickness="1" Background="#FFFFFF"/>
+        <TextBlock Text="Username:" Margin="36,165,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Foreground="#555"/>
+        <TextBox Name="UsernameTextBox" Margin="120,157,40,0" VerticalAlignment="Top" Height="35" FontSize="14" Padding="10,0" BorderBrush="#CCCCCC" BorderThickness="1" Background="#FFFFFF"/>
 
         <!-- Password Label -->
-        <TextBlock Text="Password:" Margin="40,130,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Foreground="#555"/>
-        <PasswordBox Name="PasswordBox" Margin="120,130,40,0" VerticalAlignment="Top" Height="35" FontSize="14" Padding="10,0" BorderBrush="#CCCCCC" BorderThickness="1" Background="#FFFFFF"/>
+        <TextBlock Text="Password:" Margin="40,61,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Foreground="#555" Grid.Row="1"/>
+        <PasswordBox Name="PasswordBox" Margin="120,53,40,0" VerticalAlignment="Top" Height="35" FontSize="14" Padding="10,0" BorderBrush="#CCCCCC" BorderThickness="1" Background="#FFFFFF" Grid.Row="1"/>
 
         <!-- Login Button with rounded corners using Border -->
-        <Button Width="180" Height="40" Margin="30,200,40,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16" FontWeight="Bold" Background="#4CAF50" Foreground="White" BorderBrush="#4CAF50" BorderThickness="1" Style="{StaticResource ButtonHoverStyle}" Click="LoginButton_Click">
+        <Button Width="222" Height="40" Margin="10,217,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16" FontWeight="Bold" Background="#4CAF50" Foreground="White" BorderBrush="#4CAF50" BorderThickness="1" Style="{StaticResource ButtonHoverStyle}" Click="LoginButton_Click" Grid.Row="1" Grid.RowSpan="2">
             <Button.Template>
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="10">
@@ -82,7 +116,7 @@
         </Button>
 
         <!-- Register Button with rounded corners using Border -->
-        <Button Width="180" Height="40" Margin="200,200,30,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16" FontWeight="Bold" Background="#2196F3" Foreground="White" BorderBrush="#2196F3" BorderThickness="1" Style="{StaticResource RegisterButtonHoverStyle}" Click="RegisterButton_Click">
+        <Button Width="208" Height="40" Margin="237,217,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16" FontWeight="Bold" Background="#2196F3" Foreground="White" BorderBrush="#2196F3" BorderThickness="1" Style="{StaticResource RegisterButtonHoverStyle}" Click="RegisterButton_Click" Grid.Row="1" Grid.RowSpan="2">
             <Button.Template>
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="10">
@@ -94,6 +128,6 @@
         </Button>
 
         <!-- Optional: Add a separator line between buttons -->
-        <Line X1="0" Y1="245" X2="400" Y2="245" Stroke="#DDDDDD" StrokeThickness="1" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        <Line X1="0" Y1="245" X2="400" Y2="245" Stroke="#DDDDDD" StrokeThickness="1" VerticalAlignment="Top" Grid.RowSpan="2"/>
     </Grid>
 </Window>
