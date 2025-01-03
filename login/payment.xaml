@@ -160,7 +160,7 @@
             <TabItem Header="Payments">
                 <Grid>
                     <!-- DataGrid for displaying payments -->
-                    <DataGrid x:Name="PaymentDataGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="750" Height="300" Margin="20,10,20,0" AutoGenerateColumns="True"/>
+                    <DataGrid x:Name="PaymentDataGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="750" Height="300" Margin="20,10,20,0" AutoGenerateColumns="True" SelectionChanged="PaymentDataGrid_SelectionChanged"/>
 
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20, 320, 0, 0">
                         <TextBlock Text="Payment ID" />

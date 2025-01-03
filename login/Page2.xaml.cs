@@ -228,7 +228,9 @@ namespace AuthApp
             // Générer un PDF après la sauvegarde
             GenerateReservationPdf(reservation);
             GenerateInvoicePdf(reservation);
-            SendConfirmationEmail(reservation);
+            string pdfPath = @"C:\Users\ABDO EL IDRISSI\source\repos\login\login\bin\Debug\net8.0-windows\Reservation_0.pdf";
+            SendConfirmationEmail(reservation, pdfPath);
+
         }
 
 
@@ -537,7 +539,7 @@ namespace AuthApp
 
 
 
-        private void SendConfirmationEmail(ReservationEntity reservation)
+        private void SendConfirmationEmail(ReservationEntity reservation, string pdfFilePath)
         {
             try
             {
@@ -549,6 +551,7 @@ namespace AuthApp
                     return;
                 }
 
+                // Paramètres SMTP
                 string smtpAddress = "smtp.gmail.com";
                 int portNumber = 587;
                 bool enableSSL = true;
@@ -562,7 +565,6 @@ namespace AuthApp
                               $"- Total : {reservation.Total:C}\n" +
                               "Merci de votre confiance.\n\nCordialement,\nVotre équipe.";
 
-
                 using (MailMessage mail = new MailMessage())
                 {
                     mail.From = new MailAddress(emailFrom);
@@ -570,6 +572,18 @@ namespace AuthApp
                     mail.Subject = subject;
                     mail.Body = body;
                     mail.IsBodyHtml = false;
+
+                    // Ajouter le PDF en pièce jointe
+                    if (!string.IsNullOrEmpty(pdfFilePath) && System.IO.File.Exists(pdfFilePath))
+                    {
+                        Attachment pdfAttachment = new Attachment(pdfFilePath);
+                        mail.Attachments.Add(pdfAttachment);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Le fichier PDF n'existe pas ou le chemin est incorrect.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
 
                     using (SmtpClient smtp = new SmtpClient(smtpAddress, portNumber))
                     {
@@ -579,7 +593,7 @@ namespace AuthApp
                     }
                 }
 
-                MessageBox.Show("E-mail de confirmation envoyé avec succès.", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("E-mail de confirmation envoyé avec succès, avec le PDF en pièce jointe.", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -697,7 +711,36 @@ namespace AuthApp
             this.Close();
         }
 
-        
+        private void ReservationDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Check if a reservation is selected
+            if (ReservationDataGrid.SelectedItem is ReservationEntity selectedReservation)
+            {
+                // Populate the form fields with the selected reservation's details
+                ReservationIDTextBox.Text = selectedReservation.Id.ToString();
+                StartDatePicker.SelectedDate = selectedReservation.DateDebut;
+                EndDatePicker.SelectedDate = selectedReservation.DateFin;
+                TotalTextBox.Text = selectedReservation.Total.ToString("F2");
+                StatusComboBox.SelectedItem = selectedReservation.Statut;
+                ClientIDTextBox.Text = selectedReservation.IdClient.ToString();
+                RoomIDTextBox.Text = selectedReservation.IdChambre.ToString();
+
+                // Optional: Provide feedback to the user that the reservation is selected
+                MessageBox.Show("Reservation selected for editing.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                // If no reservation is selected, clear the form fields
+                ReservationIDTextBox.Clear();
+                StartDatePicker.SelectedDate = null;
+                EndDatePicker.SelectedDate = null;
+                TotalTextBox.Clear();
+                StatusComboBox.SelectedIndex = -1;
+                ClientIDTextBox.Clear();
+                RoomIDTextBox.Clear();
+            }
+        }
+
     }
 
     // Entity class for reservations

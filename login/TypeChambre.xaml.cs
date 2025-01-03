@@ -227,6 +227,26 @@ namespace AuthApp
             x.Show();
             this.Close();
         }
+
+        private void TypeChambreDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Check if a row is selected in the DataGrid
+            if (TypeChambreDataGrid.SelectedItem != null)
+            {
+                // Cast the selected item to TypeChambreEntity
+                var selectedTypeChambre = TypeChambreDataGrid.SelectedItem as TypeChambreEntity;
+
+                // Populate the form with the selected room type data
+                if (selectedTypeChambre != null)
+                {
+                    TypeIDTextBox.Text = selectedTypeChambre.IdTypeChambre.ToString();
+                    TypeNameTextBox.Text = selectedTypeChambre.NomType;
+                    PriceTextBox.Text = selectedTypeChambre.PrixParNuit.ToString();
+                    DescriptionTextBox.Text = selectedTypeChambre.Description;
+                }
+            }
+        }
+
     }
 
     public class TypeChambreEntity

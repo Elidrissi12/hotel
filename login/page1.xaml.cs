@@ -45,8 +45,10 @@ namespace AuthApp
                                 Prenom = reader.GetString(2),
                                 Email = reader.GetString(3),
                                 Telephone = reader.IsDBNull(4) ? null : reader.GetString(4),
-                                Role = reader.IsDBNull(5) ? null : reader.GetString(5),
-                                
+                                Salaire = reader.GetDecimal(5),
+
+
+
                             });
                         }
                     }
@@ -67,15 +69,16 @@ namespace AuthApp
                 {
                     await connection.OpenAsync();
                     string query = employee.Id == 0
-                        ? "INSERT INTO Employe (Nom, Prenom, Email, Telephone, Role, Statut) VALUES (@Nom, @Prenom, @Email, @Telephone, @Role, 1)"
-                        : "UPDATE Employe SET Nom = @Nom, Prenom = @Prenom, Email = @Email, Telephone = @Telephone, Role = @Role WHERE Id = @Id";
+                        ? "INSERT INTO Employe (Nom, Prenom, Email, Telephone, Salaire) VALUES (@Nom, @Prenom, @Email, @Telephone, @Salaire)"
+                        : "UPDATE Employe SET Nom = @Nom, Prenom = @Prenom, Email = @Email, Telephone = @Telephone, Salaire = @Salaire WHERE Id = @Id";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Nom", employee.Nom);
                     command.Parameters.AddWithValue("@Prenom", employee.Prenom);
                     command.Parameters.AddWithValue("@Email", employee.Email);
                     command.Parameters.AddWithValue("@Telephone", employee.Telephone);
-                    command.Parameters.AddWithValue("@Role", employee.Role);
+                    command.Parameters.AddWithValue("@Salaire", employee.Salaire);
+
                     if (employee.Id != 0) command.Parameters.AddWithValue("@Id", employee.Id);
 
                     int rowsAffected = await command.ExecuteNonQueryAsync();
@@ -101,6 +104,14 @@ namespace AuthApp
         // Handler for the "Save" button
         private async void SaveEmployeeButton_Click(object sender, RoutedEventArgs e)
         {
+            // Parse the salary input and handle any potential errors
+            decimal salaire;
+            if (!decimal.TryParse(SalaryTextBox.Text, out salaire))
+            {
+                MessageBox.Show("Please enter a valid salary.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var employee = new Employee
             {
                 Id = int.TryParse(EmployeeIDTextBox.Text, out var id) ? id : 0,
@@ -108,12 +119,13 @@ namespace AuthApp
                 Prenom = EmployeePrenomTextBox.Text,
                 Email = EmployeeEmailTextBox.Text,
                 Telephone = EmployeeTelephoneTextBox.Text,
-                Role = PositionTextBox.Text
+                Salaire = salaire
             };
 
             await SaveEmployeeAsync(employee);
             LoadEmployeeDataAsync();
         }
+
 
         // Handler for the "Cancel" button
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -123,7 +135,6 @@ namespace AuthApp
             EmployeePrenomTextBox.Clear();
             EmployeeEmailTextBox.Clear();
             EmployeeTelephoneTextBox.Clear();
-            PositionTextBox.Clear();
             SalaryTextBox.Clear();
         }
 
@@ -134,7 +145,7 @@ namespace AuthApp
             EmployeePrenomTextBox.Clear();
             EmployeeEmailTextBox.Clear();
             EmployeeTelephoneTextBox.Clear();
-            PositionTextBox.Clear();
+            
             SalaryTextBox.Clear();
         }
 
@@ -148,9 +159,18 @@ namespace AuthApp
             if (string.IsNullOrEmpty(EmployeeNameTextBox.Text) ||
                 string.IsNullOrEmpty(EmployeePrenomTextBox.Text) ||
                 string.IsNullOrEmpty(EmployeeEmailTextBox.Text) ||
-                string.IsNullOrEmpty(PositionTextBox.Text))
+                string.IsNullOrEmpty(EmployeeTelephoneTextBox.Text) ||
+                string.IsNullOrEmpty(SalaryTextBox.Text))
             {
                 MessageBox.Show("All fields are required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Parse the salary input and handle any potential errors
+            decimal salaire;
+            if (!decimal.TryParse(SalaryTextBox.Text, out salaire))
+            {
+                MessageBox.Show("Please enter a valid salary.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -161,13 +181,13 @@ namespace AuthApp
                 Prenom = EmployeePrenomTextBox.Text,
                 Email = EmployeeEmailTextBox.Text,
                 Telephone = EmployeeTelephoneTextBox.Text,
-                Role = PositionTextBox.Text
-                
+                Salaire = salaire
             };
 
             await SaveEmployeeAsync(employee); // Use the existing SaveEmployeeAsync for both saving and updating
             LoadEmployeeDataAsync(); // Reload the employee list
         }
+
 
         private async void DeleteEmployeeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -231,7 +251,7 @@ namespace AuthApp
                         worksheet.Cell(1, 3).Value = "Prenom";
                         worksheet.Cell(1, 4).Value = "Email";
                         worksheet.Cell(1, 5).Value = "Telephone";
-                        worksheet.Cell(1, 6).Value = "Role";
+                        worksheet.Cell(1, 6).Value = "Salaire";
 
                         // Add employee data
                         for (int i = 0; i < employees.Count; i++)
@@ -242,7 +262,7 @@ namespace AuthApp
                             worksheet.Cell(i + 2, 3).Value = employee.Prenom;
                             worksheet.Cell(i + 2, 4).Value = employee.Email;
                             worksheet.Cell(i + 2, 5).Value = employee.Telephone;
-                            worksheet.Cell(i + 2, 6).Value = employee.Role;
+                            worksheet.Cell(i + 2, 6).Value = employee.Salaire;
                         }
 
                         // Save the workbook to the selected path
@@ -321,6 +341,21 @@ namespace AuthApp
             x.Show();
             this.Close();
         }
+
+        private void EmployeeDataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (EmployeeDataGrid.SelectedItem is Employee selectedEmployee)
+            {
+                // Populate the text fields with the selected employee's data
+                EmployeeIDTextBox.Text = selectedEmployee.Id.ToString();
+                EmployeeNameTextBox.Text = selectedEmployee.Nom;
+                EmployeePrenomTextBox.Text = selectedEmployee.Prenom;
+                EmployeeEmailTextBox.Text = selectedEmployee.Email;
+                EmployeeTelephoneTextBox.Text = selectedEmployee.Telephone;
+                SalaryTextBox.Text = selectedEmployee.Salaire.ToString(); // Assuming you want to display the password as well
+            }
+        }
+
     }
 
     // Modèle Employee pour représenter les données d'un employé
@@ -331,6 +366,6 @@ namespace AuthApp
         public string Prenom { get; set; }
         public string Email { get; set; }
         public string Telephone { get; set; }
-        public string Role { get; set; }
+        public decimal Salaire { get; set; }
     }
 }

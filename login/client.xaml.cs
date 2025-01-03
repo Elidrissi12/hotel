@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace AuthApp
 {
@@ -65,7 +66,7 @@ namespace AuthApp
                     await connection.OpenAsync();
                     string query = client.Id == 0
                         ? "INSERT INTO Client (LastName, FirstName, Email, Phone, Adresse) VALUES (@Nom, @Prenom, @Email, @Telephone, @Adresse)"
-                        : "UPDATE Client SET Nom = @Nom, Prenom = @Prenom, Email = @Email, Telephone = @Telephone, Adresse = @Adresse WHERE Id = @Id";
+                        : "UPDATE Client SET LastName = @Nom, FirstName = @Prenom, Email = @Email, Phone = @Telephone, Adresse = @Adresse WHERE Id = @Id";
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Nom", client.Name);
@@ -147,25 +148,43 @@ namespace AuthApp
         // Modify existing client
         private async void ModifyClientButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(NameTextBox.Text) || string.IsNullOrEmpty(PrenomTextBox.Text) || string.IsNullOrEmpty(EmailTextBox.Text) || string.IsNullOrEmpty(PhoneNumberTextBox.Text) || string.IsNullOrEmpty(AdresseTextBox.Text))
+            // Validation des champs
+            if (string.IsNullOrWhiteSpace(NameTextBox.Text) ||
+                string.IsNullOrWhiteSpace(PrenomTextBox.Text) ||
+                string.IsNullOrWhiteSpace(EmailTextBox.Text) ||
+                string.IsNullOrWhiteSpace(PhoneNumberTextBox.Text) ||
+                string.IsNullOrWhiteSpace(AdresseTextBox.Text))
             {
-                MessageBox.Show("All fields are required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Tous les champs sont requis.", "Erreur de validation", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
+            // Validation de l'ID du client
+            if (!int.TryParse(ClientIDTextBox.Text, out var id) || id <= 0)
+            {
+                MessageBox.Show("Sélectionnez un client valide pour le modifier.", "Erreur de validation", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Création de l'objet client avec les données saisies
             var client = new ClientEntity
             {
-                Id = int.TryParse(ClientIDTextBox.Text, out var id) ? id : 0,
-                Name = NameTextBox.Text,
-                Prenom = PrenomTextBox.Text,
-                Email = EmailTextBox.Text,
-                PhoneNumber = PhoneNumberTextBox.Text,
-                Adresse = AdresseTextBox.Text,
+                Id = id,
+                Name = NameTextBox.Text.Trim(),
+                Prenom = PrenomTextBox.Text.Trim(),
+                Email = EmailTextBox.Text.Trim(),
+                PhoneNumber = PhoneNumberTextBox.Text.Trim(),
+                Adresse = AdresseTextBox.Text.Trim()
             };
 
+            // Appel de la méthode pour sauvegarder les modifications
             await SaveClientAsync(client);
+
+            // Recharger les données après modification
             await LoadClientDataAsync();
         }
+
+        
 
         // Delete client
         private async void DeleteClientButton_Click(object sender, RoutedEventArgs e)
@@ -288,20 +307,35 @@ namespace AuthApp
             x.Show();
             this.Close();
         }
+
+        private void ClientDataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (ClientDataGrid.SelectedItem is ClientEntity selectedClient)
+            {
+                // Populate the input fields with the selected client's data
+                ClientIDTextBox.Text = selectedClient.Id.ToString();
+                NameTextBox.Text = selectedClient.Name;
+                PrenomTextBox.Text = selectedClient.Prenom;
+                EmailTextBox.Text = selectedClient.Email;
+                PhoneNumberTextBox.Text = selectedClient.PhoneNumber;
+                AdresseTextBox.Text = selectedClient.Adresse;
+            }
+
+        }
     }
 
-    
+
 
     // Navigation vers la page Clients (à implémenter)
-    
+
 
     // Affichage des statistiques
-    
-    
 
-    
 
-   
+
+
+
+
 
     // Entity class for clients
     public class ClientEntity

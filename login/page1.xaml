@@ -160,7 +160,7 @@
                 <!-- Onglet Liste des employés -->
                 <TabItem Header="Employees">
                     <StackPanel>
-                        <DataGrid Name="EmployeeDataGrid" AutoGenerateColumns="True" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                        <DataGrid Name="EmployeeDataGrid" AutoGenerateColumns="True" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="EmployeeDataGrid_SelectionChanged"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
                             <Button Content="Add Employee" Click="AddEmployeeButton_Click" Width="100" Margin="5"/>
                             <Button Content="Save" Name="SaveEmployeeButton" Click="SaveEmployeeButton_Click" Width="100" Margin="5"/>
@@ -195,10 +195,9 @@
                         <TextBlock Text="Telephone"/>
                         <TextBox Name="EmployeeTelephoneTextBox" Width="200" Margin="0,0,0,10"/>
 
-                        <TextBlock Text="Position"/>
-                        <TextBox Name="PositionTextBox" Width="200" Margin="0,0,0,10"/>
+                        
 
-                        <TextBlock Text="Salary"/>
+                        <TextBlock Text="Salaire"/>
                         <TextBox Name="SalaryTextBox" Width="200" Margin="0,0,0,10"/>
 
                         <!-- Boutons Save/Cancel -->

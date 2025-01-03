@@ -103,7 +103,7 @@
             <Button Style="{StaticResource SidebarButton}" Click="PymentButton_Click" HorizontalAlignment="Left">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Image Source="C:\Users\ABDO EL IDRISSI\source\repos\login\login\Images\paiement.png" Width="20" Height="20" Margin="10,0"/>
-                    <TextBlock Text="Payment" Foreground="BLACK" VerticalAlignment="Center"/>
+                    <TextBlock Text="Pyment" Foreground="BLACK" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
 

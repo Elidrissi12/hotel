@@ -172,7 +172,7 @@
                       SelectionMode="Single"
                       HorizontalAlignment="Stretch" 
                       VerticalAlignment="Top" 
-                      Margin="0,0,0,10">
+                      Margin="0,0,0,10" SelectionChanged="ChambreDataGrid_SelectionChanged">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                     <DataGridTextColumn Header="Numéro" Binding="{Binding Numero}" Width="150"/>
@@ -192,8 +192,8 @@
                 <TextBlock Text="Statut de la Chambre" Margin="0,5"/>
                 <TextBox x:Name="ChambreStatutTextBox" Margin="0,5"/>
 
-                <TextBlock Text="ID du Type de Chambre" Margin="0,5"/>
-                <TextBox x:Name="ChambreTypeIdTextBox" Margin="0,5"/>
+                <TextBlock Text="Type de Chambre" Margin="0,5"/>
+                <ComboBox x:Name="ChambreTypeComboBox" Margin="0,5"/>
 
                 <!-- Section pour RoomImage -->
                 <TextBlock Text="Image de la Chambre" Margin="0,10"/>

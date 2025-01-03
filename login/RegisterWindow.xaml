@@ -1,13 +1,23 @@
 ﻿<Window x:Class="AuthApp.RegisterWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Register" Height="300" Width="400"
+        Title="Register" Height="300" Width="393"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         WindowStyle="None">
-    <Window.Background>
+    <Window.Background >
     <ImageBrush ImageSource="C:\Users\ABDO EL IDRISSI\source\repos\login\login\bin\Debug\net8.0-windows\IMAR.png" />
 </Window.Background>
-    <Grid>
+    
+    <Grid >
+        <UIElement.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </UIElement.RenderTransform>
+
         <TextBlock Text="Username:" Margin="30,50,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <TextBox Name="UsernameTextBox" Margin="120,50,30,0" VerticalAlignment="Top" Height="30"/>
 

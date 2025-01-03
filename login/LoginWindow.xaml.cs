@@ -26,6 +26,7 @@ namespace AuthApp
                 connection.Open();
                 string query = "SELECT COUNT(1) FROM admin WHERE Username = @Username AND Password = @Password";
                 using (var command = new SqlCommand(query, connection))
+
                 {
                     command.Parameters.AddWithValue("@Username", username);
                     command.Parameters.AddWithValue("@Password", password);
@@ -34,7 +35,7 @@ namespace AuthApp
                     if (count == 1)
                     {
                         MessageBox.Show("Authentication successful!");
-                        page3 r = new page3();
+                        Dashboard r = new Dashboard();
                         r.Show();
                         this.Close();
                     }

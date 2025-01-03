@@ -263,6 +263,27 @@ namespace AuthApp
             x.Show();
             this.Close();
         }
+
+        private void PaymentDataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // Check if an item is selected in the DataGrid
+            if (PaymentDataGrid.SelectedItem != null)
+            {
+                // Cast the selected item to PaymentEntity
+                var selectedPayment = PaymentDataGrid.SelectedItem as PaymentEntity;
+
+                if (selectedPayment != null)
+                {
+                    // Populate the form fields with the data from the selected payment
+                    PaymentIDTextBox.Text = selectedPayment.Id.ToString();
+                    ReservationIDTextBox.Text = selectedPayment.IdReservation.ToString();
+                    AmountTextBox.Text = selectedPayment.Montant.ToString();
+                    PaymentDatePicker.SelectedDate = selectedPayment.DatePaiement;
+                    PaymentMethodTextBox.Text = selectedPayment.MoyenPaiement;
+                }
+            }
+        }
+
     }
 
     // Entity class for payments

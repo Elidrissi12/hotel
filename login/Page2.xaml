@@ -77,7 +77,8 @@
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
     </Window.Resources>
-    <Grid>
+    
+    <Grid >
         <!-- Grille principale avec deux colonnes -->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
@@ -159,7 +160,7 @@
         <TabControl Grid.Column="1" Margin="10">
             <TabItem Header="Reservations">
                 <Grid>
-                    <DataGrid x:Name="ReservationDataGrid" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" AutoGenerateColumns="True" Height="200" />
+                    <DataGrid x:Name="ReservationDataGrid" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" AutoGenerateColumns="True" Height="200" SelectionChanged="ReservationDataGrid_SelectionChanged" />
 
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,210,0,0">
                         <TextBlock Text="Reservation ID"/>
@@ -207,4 +208,5 @@
             </TabItem>
         </TabControl>
     </Grid>
+    
 </Window>

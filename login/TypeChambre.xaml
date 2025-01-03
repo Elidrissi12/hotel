@@ -158,7 +158,7 @@
 
         <!-- Contenu principal -->
         <Grid Grid.Column="1">
-            <DataGrid x:Name="TypeChambreDataGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="750" Height="300" Margin="20,10,20,0" AutoGenerateColumns="True"/>
+            <DataGrid x:Name="TypeChambreDataGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Width="750" Height="300" Margin="20,10,20,0" AutoGenerateColumns="True" SelectionChanged="TypeChambreDataGrid_SelectionChanged"/>
 
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20, 320, 0, 0">
                 <TextBlock Text="Type ID" />

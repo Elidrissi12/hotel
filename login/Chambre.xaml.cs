@@ -20,6 +20,7 @@ namespace AuthApp
             chambres = new ObservableCollection<ChambreEntity>();
             ChambreDataGrid.ItemsSource = chambres;
             LoadChambreDataAsync();
+            LoadRoomTypesAsync();
         }
 
         // Charger les données des chambres
@@ -97,7 +98,8 @@ namespace AuthApp
         {
             ChambreNumeroTextBox.Clear();
             ChambreStatutTextBox.Clear();
-            ChambreTypeIdTextBox.Clear();
+            ChambreTypeComboBox.SelectedIndex = -1;
+
         }
 
         // Sauvegarder une chambre
@@ -108,7 +110,9 @@ namespace AuthApp
                 Id = int.TryParse(ChambreIDTextBox.Text, out var id) ? id : 0,
                 Numero = ChambreNumeroTextBox.Text,
                 Statut = ChambreStatutTextBox.Text,
-                IdTypeChambre = int.TryParse(ChambreTypeIdTextBox.Text, out var typeId) ? typeId : 0
+                IdTypeChambre = ChambreTypeComboBox.SelectedValue != null
+        ? (int)ChambreTypeComboBox.SelectedValue
+        : 0
             };
 
             if (string.IsNullOrWhiteSpace(chambre.Numero) || string.IsNullOrWhiteSpace(chambre.Statut) || chambre.IdTypeChambre == 0)
@@ -135,13 +139,13 @@ namespace AuthApp
             ChambreIDTextBox.Clear();
             ChambreNumeroTextBox.Clear();
             ChambreStatutTextBox.Clear();
-            ChambreTypeIdTextBox.Clear();
+            ChambreTypeComboBox.SelectedIndex = -1;
 
             // Populate input fields with selected chambre details
             ChambreIDTextBox.Text = selectedChambre.Id.ToString();
             ChambreNumeroTextBox.Text = selectedChambre.Numero;
             ChambreStatutTextBox.Text = selectedChambre.Statut;
-            ChambreTypeIdTextBox.Text = selectedChambre.IdTypeChambre.ToString();
+            ChambreTypeComboBox.SelectedValue = selectedChambre.IdTypeChambre;
 
             // Optional: Provide feedback to the user
             MessageBox.Show("Les détails de la chambre sont prêts pour modification.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -282,7 +286,66 @@ namespace AuthApp
             x.Show();
             this.Close();
         }
+
+        private void ChambreDataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // Check if a chambre is selected
+            if (ChambreDataGrid.SelectedItem is ChambreEntity selectedChambre)
+            {
+                // Populate the input fields with the selected chambre's details
+                ChambreIDTextBox.Text = selectedChambre.Id.ToString();
+                ChambreNumeroTextBox.Text = selectedChambre.Numero;
+                ChambreStatutTextBox.Text = selectedChambre.Statut;
+                ChambreTypeComboBox.SelectedValue = selectedChambre.IdTypeChambre;
+
+                // Optional: Provide feedback to the user
+                MessageBox.Show("Chambre sélectionnée pour modification.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                // Clear input fields if no chambre is selected
+                ChambreIDTextBox.Clear();
+                ChambreNumeroTextBox.Clear();
+                ChambreStatutTextBox.Clear();
+                ChambreTypeComboBox.SelectedIndex = -1;
+
+            }
+        }
+        private async Task LoadRoomTypesAsync()
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.OpenAsync();
+                    string query = "SELECT Id, Nom FROM TypeChambre";
+                    SqlCommand command = new SqlCommand(query, connection);
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        ChambreTypeComboBox.Items.Clear();
+
+                        while (await reader.ReadAsync())
+                        {
+                            ChambreTypeComboBox.Items.Add(new
+                            {
+                                Id = reader.GetInt32(0),
+                                Nom = reader.GetString(1)
+                            });
+                        }
+
+                        ChambreTypeComboBox.DisplayMemberPath = "Nom";
+                        ChambreTypeComboBox.SelectedValuePath = "Id";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des types de chambre: {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
+    
 
     // Classe pour représenter une chambre
     public class ChambreEntity
