@@ -43,8 +43,8 @@ namespace AuthApp
                                 Name = reader.GetString(1),
                                 Prenom = reader.GetString(2),
                                 Email = reader.GetString(3),
-                                PhoneNumber = reader.GetString(4),
-                                Adresse = reader.GetString(5)
+                                PhoneNumber = reader.GetString(4)
+                                
                             });
                         }
                     }
