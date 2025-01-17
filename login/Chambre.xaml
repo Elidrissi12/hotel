@@ -205,7 +205,7 @@
                     <Button x:Name="SaveChambreButton" Content="Enregistrer" Margin="5" Click="SaveChambreButton_Click"/>
                     <Button x:Name="ModifyChambreButton" Content="Modifier" Margin="5" Click="ModifyChambreButton_Click"/>
                     <Button x:Name="DeleteChambreButton" Content="Supprimer" Margin="5" Click="DeleteChambreButton_Click"/>
-                    <Button x:Name="typechambreButton" Content="Accueil" Margin="5" Click="typechambreButton_Click"/>
+                    
                     <Button x:Name="UploadImageButton" Content="Télécharger une image" Margin="5" Click="UploadImageButton_Click"/>
                 </StackPanel>
             </StackPanel>

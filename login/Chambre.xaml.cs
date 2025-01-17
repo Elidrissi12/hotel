@@ -155,7 +155,7 @@ namespace AuthApp
         // Supprimer une chambre
         private async void DeleteChambreButton_Click(object sender, RoutedEventArgs e)
         {
-            // Ensure a chambre is selected
+            
             if (ChambreDataGrid.SelectedItem is not ChambreEntity chambre)
             {
                 MessageBox.Show("Veuillez sélectionner une chambre à supprimer.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);

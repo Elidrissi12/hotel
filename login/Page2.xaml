@@ -184,8 +184,9 @@
                         </ComboBox>
 
 
-                        <TextBlock Text="Client ID"/>
-                        <TextBox x:Name="ClientIDTextBox" Width="200" Margin="0,5"/>
+                        <TextBlock Text="Client"/>
+                        <ComboBox x:Name="ClientComboBox" Width="200" Margin="0,5" DisplayMemberPath="Nom" SelectedValuePath="Id"/>
+
 
                         <TextBlock Text="Room ID"/>
                         <TextBox x:Name="RoomIDTextBox" Width="200" Margin="0,5"/>

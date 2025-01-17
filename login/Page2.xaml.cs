@@ -17,6 +17,38 @@ namespace AuthApp
 {
     public partial class Reservation : Window
     {
+        private async Task LoadClientsAsync()
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.OpenAsync();
+                    string query = "SELECT Id, FirstName + ' ' + LastName AS Nom FROM Client";
+                    SqlCommand command = new SqlCommand(query, connection);
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        var clients = new ObservableCollection<Cliententity>();
+
+                        while (await reader.ReadAsync())
+                        {
+                            clients.Add(new Cliententity
+                            {
+                                Id = reader.GetInt32(0),
+                                Nom = reader.GetString(1)
+                            });
+                        }
+
+                        ClientComboBox.ItemsSource = clients;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading clients: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
         private const string ConnectionString = "Server=ZORO\\SQLEXPRESS;Database=AuthDB;Trusted_Connection=True;";
         private ObservableCollection<ReservationEntity> reservations;
 
@@ -25,7 +57,10 @@ namespace AuthApp
             InitializeComponent();
             reservations = new ObservableCollection<ReservationEntity>();
             ReservationDataGrid.ItemsSource = reservations;
-            LoadReservationDataAsync();
+
+            // Chargement des données
+            _ = LoadReservationDataAsync(); // Utilisation correcte d'une méthode asynchrone
+            _ = LoadClientsAsync();
         }
 
         // Method to load reservation data asynchronously into the DataGrid
@@ -188,7 +223,7 @@ namespace AuthApp
             EndDatePicker.SelectedDate = null;
             TotalTextBox.Clear();
             StatusComboBox.SelectedIndex = -1;
-            ClientIDTextBox.Clear();
+            ClientComboBox.SelectedIndex = -1;
             RoomIDTextBox.Clear();
         }
 
@@ -201,7 +236,7 @@ namespace AuthApp
                 DateDebut = StartDatePicker.SelectedDate ?? DateTime.MinValue,
                 DateFin = EndDatePicker.SelectedDate ?? DateTime.MinValue,
                 Statut = (StatusComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Statut non sélectionné",
-                IdClient = int.TryParse(ClientIDTextBox.Text, out var clientId) ? clientId : 0,
+                IdClient = ClientComboBox.SelectedValue != null ? (int)ClientComboBox.SelectedValue : 0,
                 IdChambre = int.TryParse(RoomIDTextBox.Text, out var roomId) ? roomId : 0
             };
 
@@ -239,7 +274,7 @@ namespace AuthApp
         private async void ModifyReservationButton_Click(object sender, RoutedEventArgs e)
         {
             var statutSelectionne = (StatusComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
-            if (string.IsNullOrEmpty(statutSelectionne) || string.IsNullOrEmpty(ClientIDTextBox.Text) || string.IsNullOrEmpty(RoomIDTextBox.Text))
+            if (ClientComboBox.SelectedValue == null || string.IsNullOrEmpty(RoomIDTextBox.Text))
 
             {
                 MessageBox.Show("All fields are required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -253,7 +288,7 @@ namespace AuthApp
                 DateFin = EndDatePicker.SelectedDate ?? DateTime.MinValue,
                 Total = decimal.TryParse(TotalTextBox.Text, out var total) ? total : 0,
                 Statut = StatusComboBox.SelectedItem.ToString(),
-                IdClient = int.TryParse(ClientIDTextBox.Text, out var clientId) ? clientId : 0,
+                IdClient = ClientComboBox.SelectedValue != null ? (int)ClientComboBox.SelectedValue : 0,
                 IdChambre = int.TryParse(RoomIDTextBox.Text, out var roomId) ? roomId : 0
             };
 
@@ -319,86 +354,110 @@ namespace AuthApp
 
 
 
-        private void GenerateReservationPdf(ReservationEntity reservation)
+        private async void GenerateReservationPdf(ReservationEntity reservation)
         {
-            // Créez un document PDF
             PdfDocument document = new PdfDocument();
-            document.Info.Title = "Reservation Bon";
-
-            // Créez une page
+            document.Info.Title = "Bon de Réservation";
             PdfPage page = document.AddPage();
             XGraphics gfx = XGraphics.FromPdfPage(page);
 
-            // Définissez des polices
-            XFont titleFont = new XFont("Arial Bold", 14);
-            XFont font = new XFont("Arial", 12);
+            // Définir les polices
+            XFont titleFont = new XFont("Arial Bold", 16); // Titre principal
+            XFont sectionTitleFont = new XFont("Arial Bold", 12); // Titres de section
+            XFont contentFont = new XFont("Arial", 10); // Texte de contenu
+            XFont footerFont = new XFont("Arial", 8); // Pied de page
 
-            // Position de départ pour le texte
-            double x = 20;
-            double y = 20;
 
-            // ===== Ajout du cadre =====
-            double margin = 10; // Marge entre le contenu et le cadre
-            double frameX = x - margin;
-            double frameY = y - margin;
-            double frameWidth = page.Width - 2 * x + 2 * margin; // Largeur du cadre
-            double frameHeight = page.Height - 100; // Hauteur du cadre (ajustable selon le contenu)
+            // Positions de départ
+            double margin = 30;
+            double x = margin;
+            double y = margin;
 
-            // Dessine le cadre
-            gfx.DrawRectangle(XPens.Black, frameX, frameY, frameWidth, frameHeight);
-
-            // ===== Ajout du logo =====
+            // En-tête avec logo et titre
             string logoPath = "IMAR.png";
             if (File.Exists(logoPath))
             {
                 XImage logo = XImage.FromFile(logoPath);
-                gfx.DrawImage(logo, 30, y, 100, 50); // Place le logo à l'intérieur du cadre
-                y += 60;
+                gfx.DrawImage(logo, x, y, 100, 50);
             }
-            else
-            {
-                gfx.DrawString("HOTEL EMSI", titleFont, XBrushes.Gray, x, y);
-                y += 40;
-            }
+            gfx.DrawString("HÔTEL IMAR", titleFont, XBrushes.Black, x + 120, y + 20);
+            gfx.DrawString("Bon de Réservation", titleFont, XBrushes.Black, x + 120, y + 40);
 
-            // ===== Titre =====
-            gfx.DrawString("Bon de Réservation", titleFont, XBrushes.Black, x, y);
-            y += 30;
+            y += 80;
 
-            // ===== Informations de la réservation =====
-            gfx.DrawString($"Reservation ID: {reservation.Id}", font, XBrushes.Black, x, y);
+            // Section d'informations sur la réservation
+            gfx.DrawString("Détails de la Réservation", sectionTitleFont, XBrushes.Black, x, y);
             y += 20;
-            gfx.DrawString($"Client ID: {reservation.IdClient}", font, XBrushes.Black, x, y);
+            gfx.DrawString($"Numéro de Réservation : {reservation.Id}", contentFont, XBrushes.Black, x, y);
             y += 20;
-            gfx.DrawString($"Start Date: {reservation.DateDebut:dd/MM/yyyy}", font, XBrushes.Black, x, y);
+            gfx.DrawString($"Date de Début : {reservation.DateDebut:dd/MM/yyyy}", contentFont, XBrushes.Black, x, y);
             y += 20;
-            gfx.DrawString($"End Date: {reservation.DateFin:dd/MM/yyyy}", font, XBrushes.Black, x, y);
+            gfx.DrawString($"Date de Fin : {reservation.DateFin:dd/MM/yyyy}", contentFont, XBrushes.Black, x, y);
             y += 20;
-            gfx.DrawString($"Total: {reservation.Total:C}", new XFont("Arial Bold", 12), XBrushes.DarkGreen, x, y);
-            y += 20;
-            gfx.DrawString($"Status: {reservation.Statut}", font, XBrushes.Black, x, y);
+            gfx.DrawString($"Statut : {reservation.Statut}", contentFont, XBrushes.Black, x, y);
+
             y += 40;
 
-            // ===== Pied de page =====
-            gfx.DrawString("Merci pour votre réservation !", font, XBrushes.Black, x, page.Height - 60);
-            gfx.DrawString("HOTEL EMSI - Téléphone: +212 6 1234 5678", font, XBrushes.Black, x, page.Height - 40);
+            // Section d'informations sur le client
+            string clientName = await GetClientNameAsync(reservation.IdClient);
+            gfx.DrawString("Informations du Client", sectionTitleFont, XBrushes.Black, x, y);
+            y += 20;
+            gfx.DrawString($"Nom du Client : {clientName}", contentFont, XBrushes.Black, x, y);
+            y += 20;
+            gfx.DrawString($"ID Client : {reservation.IdClient}", contentFont, XBrushes.Black, x, y);
 
-            // Sauvegarde
+            y += 40;
+
+            // Section d'informations sur la chambre
+            string roomName = await GetRoomNameAsync(reservation.IdChambre);
+            gfx.DrawString("Détails de la Chambre", sectionTitleFont, XBrushes.Black, x, y);
+            y += 20;
+            gfx.DrawString($"Nom de la Chambre : {roomName}", contentFont, XBrushes.Black, x, y);
+            y += 20;
+            gfx.DrawString($"ID Chambre : {reservation.IdChambre}", contentFont, XBrushes.Black, x, y);
+
+            y += 40;
+
+            // Section du montant total
+            gfx.DrawString("Montant Total", sectionTitleFont, XBrushes.Black, x, y);
+            y += 20;
+            gfx.DrawString($"Total : {reservation.Total:C}", new XFont("Arial Bold", 12), XBrushes.DarkGreen, x, y);
+
+            y += 60;
+
+            // Pied de page
+            gfx.DrawString("Merci pour votre réservation !", contentFont, XBrushes.Black, x, page.Height - margin - 40);
+            gfx.DrawString("HÔTEL IMAR - Téléphone : +212 6 1234 5678", footerFont, XBrushes.Black, x, page.Height - margin - 20);
+
+            // Enregistrement et ouverture
             string fileName = $"Reservation_{reservation.Id}.pdf";
-            try
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
-                document.Save(fileName);
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                FileName = fileName,
+                Filter = "PDF Files|*.pdf"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                fileName = saveFileDialog.FileName;
+                try
                 {
-                    FileName = fileName,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error saving PDF: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    document.Save(fileName);
+                    MessageBox.Show($"PDF enregistré avec succès : {fileName}", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = fileName,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erreur lors de l'enregistrement du PDF : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
+
 
 
 
@@ -722,7 +781,7 @@ namespace AuthApp
                 EndDatePicker.SelectedDate = selectedReservation.DateFin;
                 TotalTextBox.Text = selectedReservation.Total.ToString("F2");
                 StatusComboBox.SelectedItem = selectedReservation.Statut;
-                ClientIDTextBox.Text = selectedReservation.IdClient.ToString();
+                ClientComboBox.SelectedValue = selectedReservation.IdClient;
                 RoomIDTextBox.Text = selectedReservation.IdChambre.ToString();
 
                 // Optional: Provide feedback to the user that the reservation is selected
@@ -736,10 +795,53 @@ namespace AuthApp
                 EndDatePicker.SelectedDate = null;
                 TotalTextBox.Clear();
                 StatusComboBox.SelectedIndex = -1;
-                ClientIDTextBox.Clear();
+                ClientComboBox.SelectedIndex = -1;
                 RoomIDTextBox.Clear();
             }
         }
+
+        private async Task<string> GetClientNameAsync(int clientId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.OpenAsync();
+                    string query = "SELECT FirstName + ' ' + LastName AS Nom FROM Client WHERE Id = @ClientId";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ClientId", clientId);
+
+                    var result = await command.ExecuteScalarAsync();
+                    return result != null ? result.ToString() : "Unknown Client";
+                }
+            }
+            catch
+            {
+                return "Error Fetching Client";
+            }
+        }
+
+        private async Task<string> GetRoomNameAsync(int roomId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.OpenAsync();
+                    string query = "SELECT Numero FROM Chambre WHERE Id = @RoomId";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@RoomId", roomId);
+
+                    var result = await command.ExecuteScalarAsync();
+                    return result != null ? result.ToString() : "Unknown Room";
+                }
+            }
+            catch
+            {
+                return "Error Fetching Room";
+            }
+        }
+
 
     }
 
@@ -754,5 +856,12 @@ namespace AuthApp
         public int IdClient { get; set; }
         public int IdChambre { get; set; }
     }
+
+    public class Cliententity
+    {
+        public int Id { get; set; }
+        public string Nom { get; set; }
+    }
+
 
 }
